@@ -51,16 +51,16 @@ class FileHash:
 
     _HASH_ALGO = {
         # hashlib
-        "sha512": hashlib.sha512(),
-        "sha256": hashlib.sha256(),
-        "sha1": hashlib.sha1(),
-        "md5": hashlib.md5(),
+        "sha512": hashlib.sha512,
+        "sha256": hashlib.sha256,
+        "sha1": hashlib.sha1,
+        "md5": hashlib.md5,
         # xxhash
-        "xxh128": xxhash.xxh128(),
-        "xxh64": xxhash.xxh64(),
-        "xxh32": xxhash.xxh32(),
-        "xxh3_128": xxhash.xxh3_128(),
-        "xxh3_64": xxhash.xxh3_64(),
+        "xxh128": xxhash.xxh128,
+        "xxh64": xxhash.xxh64,
+        "xxh32": xxhash.xxh32,
+        "xxh3_128": xxhash.xxh3_128,
+        "xxh3_64": xxhash.xxh3_64,
 
     }
     def __init__(self, hash_type="sha256") -> None:
@@ -70,7 +70,7 @@ class FileHash:
                 self._hash_type = hash_type
 
     def hash_file(self, file_path, base_dir=None, chunk_size=8192) -> str:
-        hash_obj = self._HASH_ALGO[self._hash_type]
+        hash_obj = self._HASH_ALGO[self._hash_type]()
         if base_dir is not None:
             file_path = os.path.join(base_dir, file_path)
         with open(file_path, "rb") as f:
@@ -81,11 +81,11 @@ class FileHash:
     def stream_hash_folder(self, dir_path, base_dir=None, chunk_size=8192) -> str:
         if base_dir is not None:
             dir_path = os.path.join(base_dir, dir_path)
-        hash_obj = self._HASH_ALGO[self._hash_type]
+        hash_obj = self._HASH_ALGO[self._hash_type]()
         for root, dirs, files in os.walk(dir_path):
             for file in sorted(files):
                 file_path = os.path.join(root, file)
-                hash_obj.update(self.hash_file(file_path, base_dir, chunk_size).encode())
+                hash_obj.update(self.hash_file(file_path, '', chunk_size).encode())
         return hash_obj.hexdigest()
 
     def threaded_hash_folder(
@@ -107,7 +107,7 @@ class FileHash:
             regex = None
         else:
             raise ValueError("white_list must be a string, list or None")
-        hash_obj = self._HASH_ALGO[self._hash_type]
+        hash_obj = self._HASH_ALGO[self._hash_type]()
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures_to_file = {}
             results = {}
@@ -116,7 +116,7 @@ class FileHash:
                     if regex:
                         if not regex.match(file):
                             continue
-                    elif file not in white_list:
+                    elif file in white_list:
                         continue
                     file_path = os.path.join(root, file)
                     futures_to_file[executor.submit(self.hash_file, file_path, None, chunk_size)] = file
