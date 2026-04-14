@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "curseforge-fingerprint"
+version = "1.0.0"
+description = "Python binding for the CurseForge fingerprinting algorithm"
+license = "GPL-3.0"
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+dev = ["pytest"]
